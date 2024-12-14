@@ -3,29 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mortgage Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Mortgage Repayment Calculator</title>
+
+    <!-- Link to Plus Jakarta Sans Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Add Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #e6f5fc;
+            padding: 2rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+        }
+
+        /* Left Section (Form) */
+        .form-section {
+            flex: 1;
+            padding: 2rem;
+            border-right: 1px solid #d0dfea;
+        }
+
+        .form-section h1 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        label {
+            font-weight: 600;
+            margin: 0.5rem 0 0.25rem;
+            display: block;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #c8d8e4;
+            border-radius: 5px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        button {
+            background-color: #f7da47;
+            border: none;
+            color: #000;
+            font-weight: 700;
+            padding: 0.75rem;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background-color: #e0c03a;
+        }
+
+        /* Right Section (Results) */
+        .results-section {
+            flex: 1;
+            background-color: #00263a;
+            color: #fff;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .results-section h2 {
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .results-section p {
+            font-weight: 400;
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+
+        /* Attribution */
+        .attribution {
+            font-size: 11px;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .attribution a {
+            color: hsl(228, 45%, 44%);
+        }
+    </style>
 </head>
 <body>
+    <!-- Main Container -->
     <div class="container">
-        <h1>Mortgage Repayment Calculator</h1>
-        <form id="mortgage-form">
-            <label for="loan-amount">Loan Amount:</label>
-            <input type="number" id="loan-amount" placeholder="Enter loan amount" required>
+        <!-- Left Section: Form -->
+        <div class="form-section">
+            <h1>Mortgage Calculator</h1>
+            <label for="amount">Mortgage Amount</label>
+            <input type="number" id="amount" placeholder="300000">
 
-            <label for="interest-rate">Interest Rate (%):</label>
-            <input type="number" id="interest-rate" placeholder="Enter annual interest rate" required>
+            <label for="term">Mortgage Term (Years)</label>
+            <input type="number" id="term" placeholder="25">
 
-            <label for="loan-term">Loan Term (Years):</label>
-            <input type="number" id="loan-term" placeholder="Enter loan term in years" required>
+            <label for="rate">Interest Rate (%)</label>
+            <input type="number" id="rate" placeholder="5.25">
 
-            <button type="submit">Calculate</button>
-        </form>
-        <div class="results">
-            <p id="monthly-payment">Monthly Payment: $0.00</p>
-            <p id="total-payment">Total Payment: $0.00</p>
+            <label for="type">Mortgage Type</label>
+            <select id="type">
+                <option value="repayment">Repayment</option>
+                <option value="interest-only">Interest Only</option>
+            </select>
+
+            <button onclick="calculateRepayments()">
+                <i class="fas fa-calculator" style="margin-right: 8px;"></i> Calculate Repayments
+            </button>
+        </div>
+
+        <!-- Right Section: Results -->
+        <div class="results-section">
+            <!-- Add an image here -->
+             <img src="./assets/images/illustration-empty.svg" alt="illustration-empty" style="max-width: 80%; height: auto; margin-top: 2rem;">
+
+            <h2>Results shown here</h2>
+            <p>Complete the form and click "Calculate Repayments" to see your results.</p>
+            <div id="results">
+                <!-- Dynamic Results -->
+            </div>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Attribution -->
+    <div class="attribution">
+        Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>. 
+        Coded by <a href="#">PRINCE ASIRIFI</a>.
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        function calculateRepayments() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const term = parseInt(document.getElementById('term').value);
+            const rate = parseFloat(document.getElementById('rate').value);
+            const type = document.getElementById('type').value;
+
+            if (isNaN(amount) || isNaN(term) || isNaN(rate)) {
+                alert("Please enter valid inputs.");
+                return;
+            }
+
+            const monthlyRate = rate / 100 / 12;
+            const totalPayments = term * 12;
+
+            let monthlyPayment, totalRepayment;
+
+            if (type === "repayment") {
+                monthlyPayment = amount * monthlyRate / (1 - Math.pow(1 + monthlyRate, -totalPayments));
+                totalRepayment = monthlyPayment * totalPayments;
+            } else if (type === "interest-only") {
+                monthlyPayment = amount * monthlyRate;
+                totalRepayment = monthlyPayment * totalPayments;
+            }
+
+            document.getElementById("results").innerHTML = ` 
+                <p><strong>Monthly Payment:</strong> £${monthlyPayment.toFixed(2)}</p>
+                <p><strong>Total Repayment:</strong> £${totalRepayment.toFixed(2)}</p>
+            `;
+        }
+    </script>
 </body>
 </html>
